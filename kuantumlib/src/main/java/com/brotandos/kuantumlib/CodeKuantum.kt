@@ -27,16 +27,15 @@ class CodeKuantum<T: Any> (
         }
     }
 
-    override fun plus(view: Spinner): Kuantum<Int, Spinner> {
+    override fun add(view: Spinner) {
         view.apply {
-            super.plus(this)
+            super.add(this)
             adapter = ArrayAdapter<Tuple<T>>(context, R.layout.support_simple_spinner_dropdown_item, tuple).apply {
                 setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
             }
             setSelection(value)
             onItemSelectedListener = this@CodeKuantum.onItemSelectedListener
         }
-        return this
     }
 
     open class Tuple<T> (val code: T, val reaction: (T) -> Unit)

@@ -18,30 +18,34 @@ abstract class Kuantum<T: Any, V: View> {
         reactions.clear()
     }
 
-    open fun addView(view: V) {
+    open fun add(view: V) {
         viewList += view
     }
 
-    open operator fun plus(view: V): Kuantum<T, V> {
-        viewList += view
+    open fun add(reaction: (T) -> Unit) {
+        reactions += reaction
+    }
+
+    open infix fun separate(view: V) {
+        viewList.remove(view)
+    }
+
+    open infix fun separate(reaction: (T) -> Unit) {
+        reactions -= reaction
+    }
+
+    inline operator fun <K: Kuantum<*, *>> K.times(block: K.() -> Unit): K {
+        block()
         return this
     }
 
-    open operator fun plusAssign(reaction: (T) -> Unit) { reactions += reaction }
-
-    open infix fun set(value: T) {
-        this.value = value
-    }
-
-    open infix fun seperate(view: V) {
-        viewList.remove(view)
-    }
-
-    open operator fun minus(view: V) {
-        viewList.remove(view)
-    }
 }
 
-infix fun <VIEW: View> VIEW.of(q: Kuantum<*, VIEW>) {
-    q.addView(this)
+infix fun <VIEW: View, K: Kuantum<*, VIEW>> VIEW.of(q: K) {
+    q.add(this)
+}
+
+infix fun <T, K: Kuantum<T, *>> K.reacts(reaction: (T) -> Unit): K {
+    add(reaction)
+    return this
 }

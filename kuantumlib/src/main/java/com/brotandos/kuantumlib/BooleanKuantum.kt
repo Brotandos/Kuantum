@@ -21,19 +21,16 @@ class BooleanKuantum(initialValue: Boolean = false): Kuantum<Boolean, CheckBox>(
         (it as CheckBox).toggle()
     }
 
-    override fun plus(view: CheckBox): BooleanKuantum {
-        super.plus(view)
+    override fun add(view: CheckBox) {
         view.isChecked = value
         view.setOnClickListener(onClickListener)
-        return this
     }
 
-    operator fun plus(pair: Pair<CheckBox, Boolean>): BooleanKuantum {
-        pair.first.apply {
-            super.plus(this)
-            isChecked = if (pair.second) value else !value
+    fun add(vCheck: CheckBox, initialValue: Boolean) {
+        vCheck.apply {
+            super.add(this)
+            isChecked = if (initialValue) value else !value
             setOnClickListener(onClickListener)
         }
-        return this
     }
 }

@@ -29,10 +29,9 @@ class TextKuantum(text: String = "") : Kuantum<String, TextView>() {
         else v.removeTextChangedListener(textWatcher)
     }
 
-    override fun plus(view: TextView): TextKuantum {
-        super.plus(view)
+    override fun add(view: TextView) {
+        super.add(view)
         view.text = value
         (view as? EditText)?.onFocusChangeListener = onFocusChangeListener
-        return this
     }
 }
