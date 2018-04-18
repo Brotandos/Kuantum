@@ -11,6 +11,9 @@ abstract class Kuantum<T: Any, V: View> {
     protected val viewList: MutableList<V> = mutableListOf()
     protected val reactions: MutableList<(T) -> Unit> = mutableListOf()
 
+    val firstView: V get() = viewList[0]
+    val viewsSize: Int get() = viewList.size
+
     open fun resetViews() = viewList.clear()
     open fun resetReactions() = reactions.clear()
     open fun reset() {
@@ -38,7 +41,6 @@ abstract class Kuantum<T: Any, V: View> {
         block()
         return this
     }
-
 }
 
 infix fun <VIEW: View, K: Kuantum<*, VIEW>> VIEW.of(q: K) {
@@ -46,6 +48,11 @@ infix fun <VIEW: View, K: Kuantum<*, VIEW>> VIEW.of(q: K) {
 }
 
 infix fun <T, K: Kuantum<T, *>> K.reacts(reaction: (T) -> Unit): K {
+    add(reaction)
+    return this
+}
+
+operator fun <T, K: Kuantum<T, *>> K.invoke(reaction: (T) -> Unit): K {
     add(reaction)
     return this
 }
