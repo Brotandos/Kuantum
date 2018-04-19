@@ -1,7 +1,5 @@
 package com.brotandos.kuantumlib
 
-import android.content.Context
-import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -23,6 +21,21 @@ class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
                 adapter.notifyItemRangeInserted(0, value.size)
             }
         }
+
+    constructor (
+            list: MutableList<E> = mutableListOf(),
+            holderView: AnkoContext<ViewGroup>.(E, Int) -> Unit
+    ): this(list) {
+        adapter = object : RecyclerView.Adapter<KoatlViewHolder<E>>() {
+            override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
+                holder.bind(value[holder.adapterPosition], holder.adapterPosition)
+            }
+            override fun getItemCount() = size
+            override fun onCreateViewHolder(parent: ViewGroup, itemViewType: Int): KoatlViewHolder<E> {
+                return KoatlViewHolder(FrameLayout(parent.context), parent, holderView)
+            }
+        }
+    }
 
     fun forEach (action: (E) -> Unit) {
         for (element in value) action(element)

@@ -12,7 +12,7 @@ class BooleanKuantum(initialValue: Boolean = false): Kuantum<Boolean, CheckBox>(
         set(value) {
             if (field == value) return
             field = value
-            reactions.forEach { it(value) }
+            handleReaction(value)
             viewList.forEach { it.toggle() }
         }
 

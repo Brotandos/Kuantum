@@ -14,8 +14,11 @@ class TextKuantum(text: String = "") : Kuantum<String, TextView>() {
     override var value: String = text
         set(value) {
             field = value
-            reactions.forEach { it(value) }
-            for (view in viewList) if (!view.isFocused) view.text = value
+            handleReaction(value)
+            viewList.forEach {
+                if (it.isFocused.not()) it.text = value
+                it.handleReflectiveReaction(value)
+            }
         }
 
     private val textWatcher = object : TextWatcher {
@@ -33,5 +36,9 @@ class TextKuantum(text: String = "") : Kuantum<String, TextView>() {
         super.add(view)
         view.text = value
         (view as? EditText)?.onFocusChangeListener = onFocusChangeListener
+    }
+
+    override fun toString(): String {
+        return value
     }
 }

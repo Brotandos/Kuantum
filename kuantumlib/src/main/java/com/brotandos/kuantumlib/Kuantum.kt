@@ -9,32 +9,35 @@ import android.view.View
 abstract class Kuantum<T: Any, V: View> {
     abstract var value: T
     protected val viewList: MutableList<V> = mutableListOf()
-    protected val reactions: MutableList<(T) -> Unit> = mutableListOf()
+    protected var handleReaction: (T) -> Unit = {}
+    protected var handleReflectiveReaction: V.(T) -> Unit = {}
 
     val firstView: V get() = viewList[0]
     val viewsSize: Int get() = viewList.size
 
     open fun resetViews() = viewList.clear()
-    open fun resetReactions() = reactions.clear()
+    open fun clearReaction() { handleReaction = {} }
+    open fun clearReflective() { handleReflectiveReaction = {} }
     open fun reset() {
         viewList.clear()
-        reactions.clear()
+        clearReaction()
+        clearReflective()
     }
 
     open fun add(view: V) {
         viewList += view
     }
 
-    open fun add(reaction: (T) -> Unit) {
-        reactions += reaction
+    open fun set(reaction: (T) -> Unit) {
+        this.handleReaction = reaction
+    }
+
+    open fun setReflective(reflectiveReaction: V.(T) -> Unit) {
+        this.handleReflectiveReaction = reflectiveReaction
     }
 
     open infix fun separate(view: V) {
         viewList.remove(view)
-    }
-
-    open infix fun separate(reaction: (T) -> Unit) {
-        reactions -= reaction
     }
 
     inline operator fun <K: Kuantum<*, *>> K.times(block: K.() -> Unit): K {
@@ -43,16 +46,17 @@ abstract class Kuantum<T: Any, V: View> {
     }
 }
 
-infix fun <VIEW: View, K: Kuantum<*, VIEW>> VIEW.of(q: K) {
+infix fun <V: View, K: Kuantum<*, V>> V.of(q: K): V {
     q.add(this)
-}
-
-infix fun <T, K: Kuantum<T, *>> K.reacts(reaction: (T) -> Unit): K {
-    add(reaction)
     return this
 }
 
 operator fun <T, K: Kuantum<T, *>> K.invoke(reaction: (T) -> Unit): K {
-    add(reaction)
+    set(reaction)
+    return this
+}
+
+operator fun <T, V: View, K: Kuantum<T, V>> K.invoke(isReflective: Boolean, reflectiveReaction: V.(T) -> Unit): K {
+    setReflective(reflectiveReaction)
     return this
 }
