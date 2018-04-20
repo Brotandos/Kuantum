@@ -1,12 +1,12 @@
 package com.brotandos.kuantumlib
 
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.AnkoContextImpl
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.wrapContent
+import com.brotandos.koatlib.KoatlContext
+import com.brotandos.koatlib.KoatlViewHolder
+import com.brotandos.koatlib.mw
 
 class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     lateinit var adapter: RecyclerView.Adapter<KoatlViewHolder<E>>
@@ -24,7 +24,8 @@ class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
 
     constructor (
             list: MutableList<E> = mutableListOf(),
-            holderView: AnkoContext<ViewGroup>.(E, Int) -> Unit
+            handleLayoutParams: View.() -> Unit = mw,
+            holderView: KoatlContext<ViewGroup>.(E, Int) -> Unit
     ): this(list) {
         adapter = object : RecyclerView.Adapter<KoatlViewHolder<E>>() {
             override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
@@ -32,7 +33,7 @@ class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
             }
             override fun getItemCount() = size
             override fun onCreateViewHolder(parent: ViewGroup, itemViewType: Int): KoatlViewHolder<E> {
-                return KoatlViewHolder(FrameLayout(parent.context), parent, holderView)
+                return KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleLayoutParams)
             }
         }
     }
@@ -47,15 +48,18 @@ class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
 
     fun find(condition: (E) -> Boolean) = value.find(condition)
 
-    fun vForEach(holderView: AnkoContext<ViewGroup>.(E, Int) -> Unit): ListKuantum<E> {
+    fun vForEach (
+            handleLayoutParams: View.() -> Unit = mw,
+            holderView: KoatlContext<ViewGroup>.(E, Int) -> Unit
+    ): ListKuantum<E> {
         adapter = object : RecyclerView.Adapter<KoatlViewHolder<E>>() {
-            override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
-                holder.bind(value[holder.adapterPosition], holder.adapterPosition)
-            }
             override fun getItemCount() = size
-            override fun onCreateViewHolder(parent: ViewGroup, itemViewType: Int): KoatlViewHolder<E> {
-                return KoatlViewHolder(FrameLayout(parent.context), parent, holderView)
-            }
+
+            override fun onCreateViewHolder(parent: ViewGroup, itemViewType: Int)
+            = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleLayoutParams)
+
+            override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int)
+            = holder.bind(value[holder.adapterPosition], holder.adapterPosition)
         }
         return this@ListKuantum
     }
@@ -125,20 +129,10 @@ class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     fun retainAll(elements: Collection<E>): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-
-    class KoatlViewHolder<in E> (
-            private val vItem: FrameLayout,
-            private val parent: ViewGroup,
-            private val holderView: AnkoContext<ViewGroup>.(E, Int) -> Unit
-    ): RecyclerView.ViewHolder(vItem) {
-        fun bind(item: E, position: Int) {
-            vItem.layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
-            vItem.addView( AnkoContextImpl(parent.context, parent, false)
-                    .apply { holderView(item, position) }.view)
-        }
-    }
 }
 
 
-infix fun <E> RecyclerView.of(q: ListKuantum<E>) { this.adapter = q.adapter }
+infix fun <E> RecyclerView.of(q: ListKuantum<E>) : ListKuantum<E> {
+    this.adapter = q.adapter
+    return q
+}

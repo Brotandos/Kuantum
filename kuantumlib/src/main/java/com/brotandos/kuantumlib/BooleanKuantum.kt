@@ -22,6 +22,7 @@ class BooleanKuantum(initialValue: Boolean = false): Kuantum<Boolean, CheckBox>(
     }
 
     override fun add(view: CheckBox) {
+        super.add(view)
         view.isChecked = value
         view.setOnClickListener(onClickListener)
     }

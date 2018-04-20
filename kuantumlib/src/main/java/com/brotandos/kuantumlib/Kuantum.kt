@@ -28,6 +28,10 @@ abstract class Kuantum<T: Any, V: View> {
         viewList += view
     }
 
+    open infix fun becomes(value: T) {
+        this.value = value
+    }
+
     open fun set(reaction: (T) -> Unit) {
         this.handleReaction = reaction
     }
