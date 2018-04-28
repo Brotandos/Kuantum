@@ -137,3 +137,6 @@ infix fun <E> RecyclerView.of(q: ListKuantum<E>) : RecyclerView {
     this.adapter = q.adapter
     return this
 }
+
+
+fun <E> ListKuantum<E>.filter(predicate: (E) -> Boolean) = value.filter(predicate)
