@@ -76,6 +76,7 @@ class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
      * Below MutableList's functions' implementations
      * */
     val size: Int get() = value.size
+    val lastIndex: Int get() = value.lastIndex
     fun contains(element: E) = value.contains(element)
     fun containsAll(elements: Collection<E>) = value.containsAll(elements)
     fun indexOf(element: E) = value.indexOf(element)
@@ -132,7 +133,7 @@ class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
 }
 
 
-infix fun <E> RecyclerView.of(q: ListKuantum<E>) : ListKuantum<E> {
+infix fun <E> RecyclerView.of(q: ListKuantum<E>) : RecyclerView {
     this.adapter = q.adapter
-    return q
+    return this
 }
