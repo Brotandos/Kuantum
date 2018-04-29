@@ -7,7 +7,6 @@ import android.widget.FrameLayout
 import com.brotandos.koatlib.KoatlContext
 import com.brotandos.koatlib.KoatlViewHolder
 import com.brotandos.koatlib.lpRow
-import com.brotandos.koatlib.mw
 
 open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     lateinit var adapter: RecyclerView.Adapter<KoatlViewHolder<E>>
@@ -22,18 +21,20 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
                 adapter.notifyItemRangeInserted(0, value.size)
             }
         }
-    var itemViewMap = mutableMapOf<E, View>()
+    private var itemViewMap = mutableMapOf<E, View>()
+    private lateinit var handleSetOriginalLayoutParams: ViewGroup.LayoutParams.() -> Unit
 
     constructor (
             list: MutableList<E> = mutableListOf(),
-            handleLayoutParams: ViewGroup.LayoutParams.() -> Unit = lpRow,
+            handleSetLayoutParams: ViewGroup.LayoutParams.() -> Unit = lpRow,
             holderView: KoatlContext<ViewGroup>.(E, Int) -> Unit
     ): this(list) {
+        this.handleSetOriginalLayoutParams = handleSetLayoutParams
         adapter = object : RecyclerView.Adapter<KoatlViewHolder<E>>() {
             override fun getItemCount() = size
 
             override fun onCreateViewHolder(parent: ViewGroup, itemViewType: Int)
-            = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleLayoutParams)
+            = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleSetLayoutParams)
 
             override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
                 itemViewMap[value[holder.adapterPosition]] = holder.itemView
@@ -53,14 +54,15 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     fun find(condition: (E) -> Boolean) = value.find(condition)
 
     fun vForEach (
-            handleLayoutParams: ViewGroup.LayoutParams.() -> Unit = lpRow,
+            handleSetLayoutParams: ViewGroup.LayoutParams.() -> Unit = lpRow,
             holderView: KoatlContext<ViewGroup>.(E, Int) -> Unit
     ): ListKuantum<E> {
+        this.handleSetOriginalLayoutParams = handleSetLayoutParams
         adapter = object : RecyclerView.Adapter<KoatlViewHolder<E>>() {
             override fun getItemCount() = size
 
             override fun onCreateViewHolder(parent: ViewGroup, itemViewType: Int)
-            = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleLayoutParams)
+            = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleSetLayoutParams)
 
             override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
                 itemViewMap[value[holder.adapterPosition]] = holder.itemView
@@ -83,7 +85,15 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
 
     fun filterView(predicate: (E) -> Boolean) {
         itemViewMap.forEach { item, view ->
-            view.visibility = if (predicate(item)) View.VISIBLE else View.GONE
+            if (predicate(item)) {
+                view.visibility = View.VISIBLE
+                view.layoutParams.handleSetOriginalLayoutParams()
+            }
+            else {
+                view.visibility = View.GONE
+                view.layoutParams.width = 0
+                view.layoutParams.height = 0
+            }
         }
     }
 
