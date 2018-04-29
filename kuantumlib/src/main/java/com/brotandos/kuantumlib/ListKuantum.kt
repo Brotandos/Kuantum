@@ -8,7 +8,7 @@ import com.brotandos.koatlib.KoatlContext
 import com.brotandos.koatlib.KoatlViewHolder
 import com.brotandos.koatlib.mw
 
-class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
+open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     lateinit var adapter: RecyclerView.Adapter<KoatlViewHolder<E>>
     var value: MutableList<E> = list
         set(value) {
@@ -21,6 +21,7 @@ class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
                 adapter.notifyItemRangeInserted(0, value.size)
             }
         }
+    var itemViewMap = mutableMapOf<E, View>()
 
     constructor (
             list: MutableList<E> = mutableListOf(),
@@ -29,6 +30,7 @@ class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     ): this(list) {
         adapter = object : RecyclerView.Adapter<KoatlViewHolder<E>>() {
             override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
+                itemViewMap.put(value[holder.adapterPosition], holder.itemView)
                 holder.bind(value[holder.adapterPosition], holder.adapterPosition)
             }
             override fun getItemCount() = size
@@ -70,6 +72,18 @@ class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
         val element = find(condition)
         if (element != null) remove(element)
     }
+
+    open infix fun becomes(list: List<E>) {
+        value = list.toMutableList()
+    }
+
+    fun filterView(predicate: (E) -> Boolean) {
+        itemViewMap.forEach { item, view ->
+            view.visibility = if (predicate(item)) View.VISIBLE else View.GONE
+        }
+    }
+
+    fun clearViewFilter() { itemViewMap.forEach { _, view -> view.visibility = View.VISIBLE }}
 
 
     /**
@@ -137,6 +151,3 @@ infix fun <E> RecyclerView.of(q: ListKuantum<E>) : RecyclerView {
     this.adapter = q.adapter
     return this
 }
-
-
-fun <E> ListKuantum<E>.filter(predicate: (E) -> Boolean) = value.filter(predicate)
