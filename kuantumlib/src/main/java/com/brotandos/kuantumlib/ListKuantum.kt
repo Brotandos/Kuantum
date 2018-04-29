@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.brotandos.koatlib.KoatlContext
 import com.brotandos.koatlib.KoatlViewHolder
+import com.brotandos.koatlib.lpRow
 import com.brotandos.koatlib.mw
 
 open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
@@ -25,12 +26,12 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
 
     constructor (
             list: MutableList<E> = mutableListOf(),
-            handleLayoutParams: View.() -> Unit = mw,
+            handleLayoutParams: ViewGroup.LayoutParams.() -> Unit = lpRow,
             holderView: KoatlContext<ViewGroup>.(E, Int) -> Unit
     ): this(list) {
         adapter = object : RecyclerView.Adapter<KoatlViewHolder<E>>() {
             override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
-                itemViewMap.put(value[holder.adapterPosition], holder.itemView)
+                itemViewMap[value[holder.adapterPosition]] = holder.vItem
                 holder.bind(value[holder.adapterPosition], holder.adapterPosition)
             }
             override fun getItemCount() = size
@@ -51,7 +52,7 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     fun find(condition: (E) -> Boolean) = value.find(condition)
 
     fun vForEach (
-            handleLayoutParams: View.() -> Unit = mw,
+            handleLayoutParams: ViewGroup.LayoutParams.() -> Unit = lpRow,
             holderView: KoatlContext<ViewGroup>.(E, Int) -> Unit
     ): ListKuantum<E> {
         adapter = object : RecyclerView.Adapter<KoatlViewHolder<E>>() {
@@ -60,8 +61,10 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
             override fun onCreateViewHolder(parent: ViewGroup, itemViewType: Int)
             = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleLayoutParams)
 
-            override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int)
-            = holder.bind(value[holder.adapterPosition], holder.adapterPosition)
+            override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
+                itemViewMap[value[holder.adapterPosition]] = holder.vItem
+                holder.bind(value[holder.adapterPosition], holder.adapterPosition)
+            }
         }
         return this@ListKuantum
     }
