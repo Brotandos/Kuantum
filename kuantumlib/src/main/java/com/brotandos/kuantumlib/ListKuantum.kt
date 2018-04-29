@@ -97,7 +97,12 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
         }
     }
 
-    fun clearViewFilter() { itemViewMap.forEach { _, view -> view.visibility = View.VISIBLE }}
+    fun clearViewFilter() {
+        itemViewMap.forEach { _, view ->
+            view.layoutParams.handleSetOriginalLayoutParams()
+            view.visibility = View.VISIBLE
+        }
+    }
 
 
     /**
