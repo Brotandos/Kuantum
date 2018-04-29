@@ -30,13 +30,14 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
             holderView: KoatlContext<ViewGroup>.(E, Int) -> Unit
     ): this(list) {
         adapter = object : RecyclerView.Adapter<KoatlViewHolder<E>>() {
-            override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
-                itemViewMap[value[holder.adapterPosition]] = holder.vItem
-                holder.bind(value[holder.adapterPosition], holder.adapterPosition)
-            }
             override fun getItemCount() = size
-            override fun onCreateViewHolder(parent: ViewGroup, itemViewType: Int): KoatlViewHolder<E> {
-                return KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleLayoutParams)
+
+            override fun onCreateViewHolder(parent: ViewGroup, itemViewType: Int)
+            = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleLayoutParams)
+
+            override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
+                itemViewMap[value[holder.adapterPosition]] = holder.itemView
+                holder.bind(value[holder.adapterPosition], holder.adapterPosition)
             }
         }
     }
@@ -62,7 +63,7 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
             = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleLayoutParams)
 
             override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
-                itemViewMap[value[holder.adapterPosition]] = holder.vItem
+                itemViewMap[value[holder.adapterPosition]] = holder.itemView
                 holder.bind(value[holder.adapterPosition], holder.adapterPosition)
             }
         }
