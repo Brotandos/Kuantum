@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.brotandos.koatlib.KoatlContext
 import com.brotandos.koatlib.KoatlViewHolder
-import com.brotandos.koatlib.lpRow
+import com.brotandos.koatlib.row
 
 open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     lateinit var adapter: RecyclerView.Adapter<KoatlViewHolder<E>>
@@ -26,7 +26,7 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
 
     constructor (
             list: MutableList<E> = mutableListOf(),
-            handleSetLayoutParams: ViewGroup.LayoutParams.() -> Unit = lpRow,
+            handleSetLayoutParams: ViewGroup.LayoutParams.() -> Unit = row,
             holderView: KoatlContext<ViewGroup>.(E, Int) -> Unit
     ): this(list) {
         this.handleSetOriginalLayoutParams = handleSetLayoutParams
@@ -54,7 +54,7 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     fun find(condition: (E) -> Boolean) = value.find(condition)
 
     fun vForEach (
-            handleSetLayoutParams: ViewGroup.LayoutParams.() -> Unit = lpRow,
+            handleSetLayoutParams: ViewGroup.LayoutParams.() -> Unit = row,
             holderView: KoatlContext<ViewGroup>.(E, Int) -> Unit
     ): ListKuantum<E> {
         this.handleSetOriginalLayoutParams = handleSetLayoutParams
