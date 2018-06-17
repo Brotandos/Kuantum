@@ -11,13 +11,13 @@ import android.widget.Spinner
  */
 class CodeKuantum<T: Any> (
         initialPosition: Int,
-        private val tuples: List<Tuple<T>>
+        private val codeTuples: List<CodeTuple<T>>
 ): Kuantum<Int, Spinner>() {
     override var value: Int = initialPosition // selected position
         set(value) {
             field = value
             viewList.forEach { it.setSelection(value) }
-            tuples[value].apply { reactionKeeper.handler(code) }
+            codeTuples[value].apply { reactionHolder.reaction(codeValue) }
         }
 
     private val onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -30,7 +30,7 @@ class CodeKuantum<T: Any> (
     override fun add(view: Spinner) {
         view.apply {
             super.add(this)
-            adapter = ArrayAdapter<Tuple<T>>(context, R.layout.support_simple_spinner_dropdown_item, tuples).apply {
+            adapter = ArrayAdapter<CodeTuple<T>>(context, R.layout.support_simple_spinner_dropdown_item, codeTuples).apply {
                 setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
             }
             setSelection(value)
@@ -38,7 +38,14 @@ class CodeKuantum<T: Any> (
         }
     }
 
-    open class Tuple<T> (val code: T, val reactionKeeper: Keeper<(T) -> Unit>)
+    open class CodeTuple<T> (
+            val codeValue: T,
+            val reactionHolder: ReactionHolder<(T) -> Unit>,
+            private val label: String = codeValue.toString()
+    ) {
+        override fun toString() = label
+    }
 
-    data class Keeper<T> (var handler: T)
+
+    data class ReactionHolder<T> (var reaction: T)
 }

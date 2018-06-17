@@ -10,7 +10,7 @@ import com.brotandos.koatlib.row
 
 open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     lateinit var adapter: RecyclerView.Adapter<KoatlViewHolder<E>>
-    var value: MutableList<E> = list
+    var list: MutableList<E> = list
         set(value) {
             if (::adapter.isInitialized) {
                 adapter.notifyItemRangeRemoved(0, field.size)
@@ -37,21 +37,21 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
             = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleSetLayoutParams)
 
             override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
-                itemViewMap[value[holder.adapterPosition]] = holder.itemView
-                holder.bind(value[holder.adapterPosition], holder.adapterPosition)
+                itemViewMap[list[holder.adapterPosition]] = holder.itemView
+                holder.bind(list[holder.adapterPosition], holder.adapterPosition)
             }
         }
     }
 
     fun forEach (action: (E) -> Unit) {
-        for (element in value) action(element)
+        for (element in list) action(element)
     }
 
     fun forEachIndexed (action: (E, Int) -> Unit) {
-        value.forEachIndexed { index, e -> action(e, index) }
+        list.forEachIndexed { index, e -> action(e, index) }
     }
 
-    fun find(condition: (E) -> Boolean) = value.find(condition)
+    fun find(condition: (E) -> Boolean) = list.find(condition)
 
     fun vForEach (
             handleSetLayoutParams: ViewGroup.LayoutParams.() -> Unit = row,
@@ -65,14 +65,14 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
             = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleSetLayoutParams)
 
             override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
-                itemViewMap[value[holder.adapterPosition]] = holder.itemView
-                holder.bind(value[holder.adapterPosition], holder.adapterPosition)
+                itemViewMap[list[holder.adapterPosition]] = holder.itemView
+                holder.bind(list[holder.adapterPosition], holder.adapterPosition)
             }
         }
         return this@ListKuantum
     }
 
-    operator fun get(i: Int): E = value[i]
+    operator fun get(i: Int): E = list[i]
 
     fun removeFirstWhere(condition: (E) -> Boolean) {
         val element = find(condition)
@@ -80,7 +80,7 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     }
 
     open infix fun becomes(list: List<E>) {
-        value = list.toMutableList()
+        this.list = list.toMutableList()
     }
 
     fun filterView(predicate: (E) -> Boolean) {
@@ -108,43 +108,43 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     /**
      * Below MutableList's functions' implementations
      * */
-    val size: Int get() = value.size
-    val lastIndex: Int get() = value.lastIndex
-    fun contains(element: E) = value.contains(element)
-    fun containsAll(elements: Collection<E>) = value.containsAll(elements)
-    fun indexOf(element: E) = value.indexOf(element)
-    fun isEmpty() = value.isEmpty()
-    fun iterator(): MutableIterator<E> = value.iterator()
-    fun lastIndexOf(element: E) = value.lastIndexOf(element)
-    fun listIterator() = value.listIterator()
-    fun listIterator(index: Int) = value.listIterator(index)
-    fun set(index: Int, element: E) = value.set(index, element)
-    fun subList(fromIndex: Int, toIndex: Int) = value.subList(fromIndex, toIndex)
+    val size: Int get() = list.size
+    val lastIndex: Int get() = list.lastIndex
+    fun contains(element: E) = list.contains(element)
+    fun containsAll(elements: Collection<E>) = list.containsAll(elements)
+    fun indexOf(element: E) = list.indexOf(element)
+    fun isEmpty() = list.isEmpty()
+    fun iterator(): MutableIterator<E> = list.iterator()
+    fun lastIndexOf(element: E) = list.lastIndexOf(element)
+    fun listIterator() = list.listIterator()
+    fun listIterator(index: Int) = list.listIterator(index)
+    fun set(index: Int, element: E) = list.set(index, element)
+    fun subList(fromIndex: Int, toIndex: Int) = list.subList(fromIndex, toIndex)
 
     fun add(index: Int, element: E) {
-        value.add(index, element)
+        list.add(index, element)
         adapter.notifyItemInserted(index)
     }
 
     fun add(element: E) {
-        value.add(element)
-        val i = value.lastIndex
+        list.add(element)
+        val i = list.lastIndex
         adapter.notifyItemInserted(i)
     }
 
     fun clear() {
-        val size = value.size
-        value.clear()
+        val size = list.size
+        list.clear()
         adapter.notifyItemRangeRemoved(0, size)
     }
 
     fun remove(element: E) {
-        val i = value.indexOf(element)
+        val i = list.indexOf(element)
         removeAt(i)
     }
 
     fun removeAt(index: Int) {
-        value.removeAt(index)
+        list.removeAt(index)
         adapter.notifyItemRemoved(index)
     }
 
@@ -166,7 +166,7 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
 }
 
 
-infix fun <E> RecyclerView.of(q: ListKuantum<E>) : RecyclerView {
+infix fun <RV: RecyclerView, E> RV.of(q: ListKuantum<E>) : RV {
     this.adapter = q.adapter
     return this
 }

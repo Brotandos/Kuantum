@@ -57,7 +57,7 @@ open class BooleanKuantum(initialValue: Boolean = false): Kuantum<Boolean, Check
  * BooleanKuantum's visibility trigger of View
  * 't' marker stands for 'trigger'
  * */
-infix fun View.visibility(qVisibility: BooleanKuantum): View {
+infix fun <T: View> T.visibility(qVisibility: BooleanKuantum): T {
     qVisibility triggers { this.visibility = if (it) View.VISIBLE else View.GONE }
     return this
 }
