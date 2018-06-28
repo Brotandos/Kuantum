@@ -17,7 +17,7 @@ class CodeKuantum<T: Any> (
         set(value) {
             field = value
             viewList.forEach { it.setSelection(value) }
-            codeTuples[value].apply { reactionHolder.reaction(codeValue) }
+            codeTuples[value].apply { reaction(codeValue) }
         }
 
     private val onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -40,12 +40,9 @@ class CodeKuantum<T: Any> (
 
     open class CodeTuple<T> (
             val codeValue: T,
-            val reactionHolder: ReactionHolder<(T) -> Unit>,
+            val reaction: (T) -> Unit,
             private val label: String = codeValue.toString()
     ) {
         override fun toString() = label
     }
-
-
-    data class ReactionHolder<T> (var reaction: T)
 }

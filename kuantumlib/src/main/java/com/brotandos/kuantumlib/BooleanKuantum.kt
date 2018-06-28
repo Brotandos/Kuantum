@@ -1,13 +1,13 @@
 package com.brotandos.kuantumlib
 
 import android.view.View
-import android.widget.CheckBox
+import android.widget.CompoundButton
 
 /**
  * @author: Brotandos
  * @creation_date: 08.04.2018
  */
-open class BooleanKuantum(initialValue: Boolean = false): Kuantum<Boolean, CheckBox>() {
+open class BooleanKuantum(initialValue: Boolean = false): Kuantum<Boolean, CompoundButton>() {
     override var value: Boolean = initialValue
         set(value) {
             if (field == value) return
@@ -30,16 +30,16 @@ open class BooleanKuantum(initialValue: Boolean = false): Kuantum<Boolean, Check
 
     private val onClickListener = View.OnClickListener {
         value = !value
-        (it as CheckBox).toggle()
+        (it as CompoundButton).toggle()
     }
 
-    override fun add(view: CheckBox) {
+    override fun add(view: CompoundButton) {
         super.add(view)
         view.isChecked = value
         view.setOnClickListener(onClickListener)
     }
 
-    fun add(vCheck: CheckBox, initialValue: Boolean) {
+    fun add(vCheck: CompoundButton, initialValue: Boolean) {
         vCheck.apply {
             super.add(this)
             isChecked = if (initialValue) value else !value
