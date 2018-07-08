@@ -34,7 +34,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    implementation 'com.github.Brotandos:koatl:5d5b712fe2'
+    implementation 'com.github.Brotandos:koatl-context:cf19514fb4'
     implementation "com.android.support:recyclerview-v7:$support_version"
 
     implementation "org.jetbrains.anko:anko-commons:$anko_version"

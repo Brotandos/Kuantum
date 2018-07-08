@@ -4,9 +4,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import com.brotandos.koatlib.KoatlContext
-import com.brotandos.koatlib.KoatlViewHolder
-import com.brotandos.koatlib.row
+import com.brotandos.koatlcontextlib.KoatlContext
+import com.brotandos.koatlcontextlib.KoatlViewHolder
+import com.brotandos.koatlcontextlib.row
 
 open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     lateinit var adapter: RecyclerView.Adapter<KoatlViewHolder<E>>
