@@ -9,15 +9,18 @@ import android.widget.Spinner
  * @author: Brotandos
  * @creation_date: 08.04.2018
  */
-class CodeKuantum<T: Any> (
-        initialPosition: Int,
-        private val codeTuples: List<CodeTuple<T>>
+class CaseKuantum<T: Any> (
+        private val cases: List<Case<T>>,
+        initialPosition: Int = 0
 ): Kuantum<Int, Spinner>() {
+
+    constructor(vararg cases: Case<T>, initialPosition: Int = 0) : this(cases.toList(), initialPosition)
+
     override var value: Int = initialPosition // selected position
         set(value) {
             field = value
             viewList.forEach { it.setSelection(value) }
-            codeTuples[value].apply { reaction(codeValue) }
+            cases[value].apply { reaction(caseValue) }
         }
 
     private val onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -30,18 +33,18 @@ class CodeKuantum<T: Any> (
     override fun add(view: Spinner) {
         view.apply {
             super.add(this)
-            adapter = ArrayAdapter<CodeTuple<T>>(context, R.layout.support_simple_spinner_dropdown_item, codeTuples).apply {
+            adapter = ArrayAdapter<Case<T>>(context, R.layout.support_simple_spinner_dropdown_item, cases).apply {
                 setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
             }
             setSelection(value)
-            onItemSelectedListener = this@CodeKuantum.onItemSelectedListener
+            onItemSelectedListener = this@CaseKuantum.onItemSelectedListener
         }
     }
 
-    open class CodeTuple<T> (
-            val codeValue: T,
+    open class Case<T> (
+            val caseValue: T,
             val reaction: (T) -> Unit,
-            private val label: String = codeValue.toString()
+            private val label: String = caseValue.toString()
     ) {
         override fun toString() = label
     }
