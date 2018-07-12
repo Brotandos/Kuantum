@@ -55,6 +55,11 @@ infix fun <V: View, K: Kuantum<*, V>> V.of(q: K): V {
     return this
 }
 
+infix fun <V: View, K: Kuantum<*, V>> V.displays(q: K): V {
+    q.add(this)
+    return this
+}
+
 operator fun <T, K: Kuantum<T, *>> K.invoke(reaction: (T) -> Unit): K {
     set(reaction)
     return this
