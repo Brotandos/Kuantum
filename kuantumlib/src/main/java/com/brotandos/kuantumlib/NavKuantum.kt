@@ -2,7 +2,10 @@ package com.brotandos.kuantumlib
 
 import android.support.design.internal.BottomNavigationPresenter
 import android.support.design.widget.BottomNavigationView
+import android.support.v7.view.menu.MenuBuilder
+import android.support.v7.view.menu.MenuPresenter
 import android.view.Menu
+import android.view.MenuItem
 
 class NavKuantum <T: BottomNavigationView> (
         private val navItems: List<NavItem>,
@@ -71,11 +74,36 @@ class NavKuantum <T: BottomNavigationView> (
         set(value) {
             field = value
             val navItem = navItems.find { it.itemId == value }!!
-            /* TODO handle for rest views
             viewList.forEach {
-                if (it.selectedItemId != value)
+                if (it.selectedItemId != value) {
+
+                    val mMenuField = BottomNavigationView::class.java.getDeclaredField("mMenu")
+                    mMenuField.isAccessible = true
+                    val mMenu = mMenuField.get(it) as Menu
+                    val menuItem = mMenu.findItem(value)
+
+                    if (menuItem != null) {
+                        val mPresenterField = BottomNavigationView::class.java.getDeclaredField("mPresenter")
+                        mPresenterField.isAccessible = true
+
+                        val performItemAction = MenuBuilder::class.java.getDeclaredMethod(
+                                "performItemAction",
+                                MenuItem::class.java,
+                                MenuPresenter::class.java,
+                                Int::class.java
+                        ).invoke(mMenu, menuItem, mPresenterField.get(it), 0) as Boolean
+
+                        if (performItemAction) {
+                            menuItem.isChecked = true
+                        }
+
+                        mMenuField.isAccessible = false
+                        mPresenterField.isAccessible = false
+                    }
+
                     it.selectedItemId = value
-            }*/
+                }
+            }
             navItem.hReaction(navItem)
         }
 
@@ -91,6 +119,14 @@ class NavKuantum <T: BottomNavigationView> (
         }
     }
 
+    fun select(navItem: NavItem) {
+        value = navItem.itemId
+    }
+
+    fun select(navItemId: Int) {
+        value = navItemId
+    }
+
     class NavItem (val title: String,
                    val hReaction: (NavItem) -> Unit,
                    val iconResId: Int = 0,
@@ -98,4 +134,27 @@ class NavKuantum <T: BottomNavigationView> (
         var itemId: Int = 0
         var order: Int = 0
     }
+}
+
+
+class NavKuantumBuilder<T: BottomNavigationView> {
+
+    val navItems = mutableListOf<NavKuantum.NavItem>()
+
+    fun navItem(title: String,
+                onSelect: (NavKuantum.NavItem) -> Unit,
+                iconResId: Int = 0,
+                isReselectable: Boolean = false): NavKuantum.NavItem {
+        val navItem = NavKuantum.NavItem(title, onSelect, iconResId, isReselectable)
+        navItems += navItem
+        return navItem
+    }
+
+    fun build(): NavKuantum<T> = NavKuantum(navItems)
+}
+
+fun <T: BottomNavigationView> navKuantum(init: NavKuantumBuilder<T>.() -> Unit): NavKuantum<T> {
+    val navKuantumBuilder = NavKuantumBuilder<T>()
+    navKuantumBuilder.init()
+    return navKuantumBuilder.build()
 }
