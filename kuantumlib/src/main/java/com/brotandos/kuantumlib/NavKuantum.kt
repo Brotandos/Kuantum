@@ -17,7 +17,6 @@ class NavKuantum <T: BottomNavigationView> (
     init {
         navItems.forEachIndexed { index, navItem ->
             navItem.order = index
-            navItem.itemId = index + 1
         }
     }
 
@@ -37,7 +36,7 @@ class NavKuantum <T: BottomNavigationView> (
                     Int::class.java,
                     Int::class.java,
                     CharSequence::class.java
-            ).invoke(mMenu, Menu.NONE, navItem.itemId, navItem.order, navItem.title)
+            ).invoke(mMenu, Menu.NONE, navItem.id, navItem.order, navItem.title)
 
             if (navItem.iconResId > 0) {
                 (mMenu as Menu).getItem(navItem.order).setIcon(navItem.iconResId)
@@ -70,10 +69,10 @@ class NavKuantum <T: BottomNavigationView> (
         mPresenterField.isAccessible = false
     }
 
-    override var value: Int = navItems[initialPosition].itemId
+    override var value: Int = navItems[initialPosition].id
         set(value) {
             field = value
-            val navItem = navItems.find { it.itemId == value }!!
+            val navItem = navItems.find { it.id == value }!!
             viewList.forEach {
                 if (it.selectedItemId != value) {
 
@@ -112,7 +111,7 @@ class NavKuantum <T: BottomNavigationView> (
         view.setupMenu()
         view.setOnNavigationItemSelectedListener {
             val navItem = navItems[it.order]
-            if (navItem.itemId == value && !navItem.isReselectable)
+            if (navItem.id == value && !navItem.isReselectable)
                 return@setOnNavigationItemSelectedListener false
             value = it.itemId
             true
@@ -120,7 +119,7 @@ class NavKuantum <T: BottomNavigationView> (
     }
 
     fun select(navItem: NavItem) {
-        value = navItem.itemId
+        value = navItem.id
     }
 
     fun select(navItemId: Int) {
@@ -129,28 +128,39 @@ class NavKuantum <T: BottomNavigationView> (
 
     class NavItem (val title: String,
                    val hReaction: (NavItem) -> Unit,
+                   val id: Int,
                    val iconResId: Int = 0,
                    val isReselectable: Boolean = false) {
-        var itemId: Int = 0
         var order: Int = 0
     }
 }
 
 
 class NavKuantumBuilder<T: BottomNavigationView> {
+    var selected: NavKuantum.NavItem? = null
 
     val navItems = mutableListOf<NavKuantum.NavItem>()
 
     fun navItem(title: String,
-                onSelect: (NavKuantum.NavItem) -> Unit,
+                id: Int,
                 iconResId: Int = 0,
-                isReselectable: Boolean = false): NavKuantum.NavItem {
-        val navItem = NavKuantum.NavItem(title, onSelect, iconResId, isReselectable)
+                isReselectable: Boolean = false,
+                onSelect: (NavKuantum.NavItem) -> Unit = {}): NavKuantum.NavItem {
+        val navItem = NavKuantum.NavItem(title, onSelect, id, iconResId, isReselectable)
         navItems += navItem
         return navItem
     }
 
-    fun build(): NavKuantum<T> = NavKuantum(navItems)
+    operator fun NavKuantum.NavItem.not() = {
+        selected = this
+    }
+
+    fun build(): NavKuantum<T> {
+        val qNav = NavKuantum<T>(navItems)
+        if (selected != null)
+            qNav.select(selected!!)
+        return qNav
+    }
 }
 
 fun <T: BottomNavigationView> navKuantum(init: NavKuantumBuilder<T>.() -> Unit): NavKuantum<T> {
