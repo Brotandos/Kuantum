@@ -65,6 +65,11 @@ operator fun <T, K: Kuantum<T, *>> K.invoke(reaction: (T) -> Unit): K {
     return this
 }
 
+operator fun <T, K: Kuantum<T, *>> K.invoke(newValue: T): K {
+    value = newValue
+    return this
+}
+
 operator fun <T, V: View, K: Kuantum<T, V>> K.invoke(isReflective: Boolean, reflectiveReaction: V.(T) -> Unit): K {
     setReflective(reflectiveReaction)
     return this

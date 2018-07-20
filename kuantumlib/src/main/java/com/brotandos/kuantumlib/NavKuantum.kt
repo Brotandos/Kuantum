@@ -151,8 +151,9 @@ class NavKuantumBuilder<T: BottomNavigationView> {
         return navItem
     }
 
-    operator fun NavKuantum.NavItem.not() = {
+    operator fun NavKuantum.NavItem.not(): NavKuantum.NavItem {
         selected = this
+        return this
     }
 
     fun build(): NavKuantum<T> {
