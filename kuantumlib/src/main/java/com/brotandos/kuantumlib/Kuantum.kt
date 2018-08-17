@@ -12,7 +12,10 @@ abstract class Kuantum<T: Any, V: View> {
     protected var handleReaction: (T) -> Unit = {}
     protected var handleReflectiveReaction: V.(T) -> Unit = {}
 
-    val firstView: V get() = viewList[0]
+    val firstView: V get() {
+        if (viewList.isEmpty()) throw IndexOutOfBoundsException("There's no attached views")
+        return viewList[0]
+    }
     val viewsSize: Int get() = viewList.size
 
     open fun resetViews() = viewList.clear()
@@ -62,11 +65,6 @@ infix fun <V: View, K: Kuantum<*, V>> V.displays(q: K): V {
 
 operator fun <T, K: Kuantum<T, *>> K.invoke(reaction: (T) -> Unit): K {
     set(reaction)
-    return this
-}
-
-operator fun <T, K: Kuantum<T, *>> K.invoke(newValue: T): K {
-    value = newValue
     return this
 }
 

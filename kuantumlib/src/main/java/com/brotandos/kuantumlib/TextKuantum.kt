@@ -21,6 +21,10 @@ class TextKuantum(text: String = "") : Kuantum<String, TextView>() {
             }
         }
 
+    constructor(text: String = "", reaction: (String) -> Unit) : this(text) {
+        handleReaction = reaction
+    }
+
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
