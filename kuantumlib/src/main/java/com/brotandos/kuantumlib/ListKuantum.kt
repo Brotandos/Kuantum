@@ -75,15 +75,15 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     operator fun get(i: Int): E = list[i]
 
     fun removeFirstWhere(condition: (E) -> Boolean) {
-        val element = find(condition)
-        if (element != null) remove(element)
+        val element = find(condition) ?: throw RuntimeException("Element not found")
+        remove(element)
     }
 
     open infix fun becomes(list: List<E>) {
         this.list = list.toMutableList()
     }
 
-    fun filterView(predicate: (E) -> Boolean) {
+    fun filter(predicate: (E) -> Boolean) {
         itemViewMap.forEach { item, view ->
             if (predicate(item)) {
                 view.visibility = View.VISIBLE
