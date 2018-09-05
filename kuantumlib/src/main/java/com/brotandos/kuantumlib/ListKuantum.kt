@@ -16,10 +16,7 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
                 adapter.notifyItemRangeRemoved(0, field.size)
                 field = value
                 adapter.notifyItemRangeInserted(0, value.size)
-            } else {
-                field = value
-                adapter.notifyItemRangeInserted(0, value.size)
-            }
+            } else field = value
         }
     private var itemViewMap = mutableMapOf<E, View>()
     private lateinit var handleSetOriginalLayoutParams: ViewGroup.LayoutParams.() -> Unit
@@ -37,8 +34,10 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
             = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleSetLayoutParams)
 
             override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
-                itemViewMap[list[holder.adapterPosition]] = holder.itemView
-                holder.bind(list[holder.adapterPosition], holder.adapterPosition)
+                val i = holder.adapterPosition
+                val item = list[i]
+                itemViewMap[item] = holder.itemView
+                holder.bind(item, i)
             }
         }
     }
@@ -65,8 +64,10 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
             = KoatlViewHolder(FrameLayout(parent.context), parent, holderView, handleSetLayoutParams)
 
             override fun onBindViewHolder(holder: KoatlViewHolder<E>, position: Int) {
-                itemViewMap[list[holder.adapterPosition]] = holder.itemView
-                holder.bind(list[holder.adapterPosition], holder.adapterPosition)
+                val i = holder.adapterPosition
+                val item = list[i]
+                itemViewMap[item] = holder.itemView
+                holder.bind(item, i)
             }
         }
         return this@ListKuantum
@@ -135,10 +136,12 @@ open class ListKuantum<E>(list: MutableList<E> = mutableListOf()) {
     fun clear() {
         val size = list.size
         list.clear()
+        itemViewMap.clear()
         adapter.notifyItemRangeRemoved(0, size)
     }
 
     fun remove(element: E) {
+        itemViewMap.remove(element)
         val i = list.indexOf(element)
         removeAt(i)
     }

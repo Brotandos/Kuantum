@@ -10,15 +10,19 @@ import android.widget.TextView
  * @author: Brotandos
  * @creation_date: 08.04.2018
  */
-class TextKuantum(text: String = "") : Kuantum<String, TextView>() {
+open class TextKuantum(text: String = "") : Kuantum<String, TextView>() {
     override var value: String = text
         set(value) {
             field = value
-            handleReaction(value)
             viewList.forEach {
-                if (it.isFocused.not()) it.text = value
+                /**
+                 * If view is not under the focus, text must be updated
+                 * */
+                val needToUpdateValue = !it.isFocused
+                if (needToUpdateValue) it.text = value
                 it.handleReflectiveReaction(value)
             }
+            handleReaction(value)
         }
 
     constructor(text: String = "", reaction: (String) -> Unit) : this(text) {
@@ -31,10 +35,18 @@ class TextKuantum(text: String = "") : Kuantum<String, TextView>() {
         override fun afterTextChanged(s: Editable?) { value = s.toString() }
     }
 
+    /**
+     * Need to restrict infinite text changing
+     * If view is under the focus, update [value] by textWatcher
+     * else just update by [EditText.setText]
+     * */
     private val onFocusChangeListener = View.OnFocusChangeListener { v, focused -> if (v is EditText)
         if (focused) v.addTextChangedListener(textWatcher)
         else v.removeTextChangedListener(textWatcher)
+        onFocusChanged()
     }
+
+    open fun onFocusChanged() {}
 
     override fun add(view: TextView) {
         super.add(view)
