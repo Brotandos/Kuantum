@@ -19,14 +19,14 @@ fun BufferedInputStream.getString() : String {
 }
 
 
-interface LoadableApp {
+interface RequestInfoHolder {
     val baseUrl: String
     val defaultTimeout: Int
 }
 
 
-abstract class LoadableInteractor(baseUrl: String? = null,
-                                  private val app: LoadableApp? = null) {
+abstract class HttpInteractor(baseUrl: String? = null,
+                              private val requestInfoHolder: RequestInfoHolder? = null) {
 
     /**
      * TODOs
@@ -38,7 +38,7 @@ abstract class LoadableInteractor(baseUrl: String? = null,
 
     private val baseUrl = when {
         baseUrl != null -> baseUrl
-        app != null -> app.baseUrl
+        requestInfoHolder != null -> requestInfoHolder.baseUrl
         else -> ""
     }
 
@@ -49,12 +49,12 @@ abstract class LoadableInteractor(baseUrl: String? = null,
 
         loadingMarker?.let { it becomes true }
 
-        this@LoadableInteractor.doAsync {
+        this@HttpInteractor.doAsync {
             val url = URL(baseUrl + this@httpGet)
             with(url.openConnection() as HttpURLConnection) {
                 requestMethod = "GET"
 
-                val timeout = connectionTimeout ?: app?.defaultTimeout
+                val timeout = connectionTimeout ?: requestInfoHolder?.defaultTimeout
                 timeout?.let { connectTimeout = it }
 
                 try {
